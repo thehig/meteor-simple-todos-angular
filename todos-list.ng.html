@@ -1,40 +1,69 @@
 <div class="container">
   <header>
+  <!-- Show the results of incompleteCount() in the header -->
     <h1>Todo List ( {{ incompleteCount() }} )</h1>
- 
- 	<label class="hide-completed">
-      <input type="checkbox" ng-model="$parent.hideCompleted"/>
+
+    <label class="hide-completed">
+      <!-- ng-model binds this input checkbox to the $parent.hideCompleted variable -->
+      <input type="checkbox" 
+              ng-model="$parent.hideCompleted"/>
       Hide Completed Tasks
     </label>
 
-	<meteor-include src="loginButtons"></meteor-include>
+    <!-- Include/insert the Meteor loginButtons Blaze template -->
+    <meteor-include src="loginButtons"></meteor-include>
 
 
-    <!-- add a form below the h1 -->
+    <!-- New task form:
+        * ng-submit="addTask(newTask); newTask='';"     - Clicking submit will call addTask with the 'newTask'
+                                                        -   data model from below, then create a new 'newTask' 
+        * ng-show="$root.currentUser"                   - Only show this if $root.currentUser exists 
+                                                        -   (user is logged in)
+     -->
     <form class="new-task"
-          ng-submit="addTask(newTask); newTask='';"
-          ng-show="$root.currentUser">
+            ng-submit="addTask(newTask); newTask='';"
+            ng-show="$root.currentUser">
+      <!-- New Task input box:
+        * ng-model="newTask"                            - The model to bind to (referenced/submitted above)
+      -->
       <input ng-model="newTask" 
-      			type="text" 
-      			name="text" 
-      			placeholder="Type to add new tasks" />
+            type="text" 
+            name="text" 
+            placeholder="Type to add new tasks" />
     </form>
   </header>
  
+  <!-- ng-repeat will repeat the <li> for each task -->
   <ul ng-repeat="task in tasks">
+    <!-- ng-class will have css classes 'checked' and 'private' if the task has truthy values for same -->
     <li ng-class="{'checked': task.checked, 'private': task.private}">
+      <!-- ng-click will call deleteTask(task) -->
       <button class="delete" ng-click="deleteTask(task)">&times;</button>
- 
-      <input type="checkbox" ng-checked="task.checked"
-             ng-click="setChecked(task)" class="toggle-checked" />
+      
+      <!-- Toggle Complete Checkbox:
+        * ng-checked="task.checked"       - Bind the checkbox checked state to task.checked
+        * ng-click="setChecked(task)"     - Clicking the checkbox calls setChecked(task)
+       -->
+      <input type="checkbox" 
+              ng-checked="task.checked"
+              ng-click="setChecked(task)" 
+              class="toggle-checked" />
 
-     <button class="toggle-private"
-              ng-if="task.owner === $root.currentUser._id"
-              ng-click="setPrivate(task)">
+      <!-- Toggle Privacy Button:
+        * ng-if="task.owner === $root.currentUser._id"    - Only show this if current user is the owner
+        * ng-click="setPrivate(task)"                     - Clicking this button calls setPrivate(task)
+       -->
+      <button class="toggle-private"
+                ng-if="task.owner === $root.currentUser._id"
+                ng-click="setPrivate(task)">
+        <!-- Inline ternary operator:
+          * if the task is private, show "Private", else show "Public"
+        -->
         {{task.private == true ? "Private" : "Public"}}
       </button>
- 
+
       <span class="text">
+        <!-- Show the username in bold, and the task text -->
         <strong>{{task.username}}</strong> - {{task.text}}
       </span>
     </li>
